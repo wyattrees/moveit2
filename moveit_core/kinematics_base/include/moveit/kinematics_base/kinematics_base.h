@@ -525,6 +525,17 @@ public:
     return default_timeout_;
   }
 
+  /** @brief Prepare for one of a series of successive IK calls, whose eventual goal is \e goal_pose.
+   * @param percentage How far along the path the next IK call will put us towards \e goal_pose
+   * @param goal_pose The end pose we are trying to achieve at the end of all IK calls
+   * @param goal_options Container for other IK options, specific to end goal. See definition of KinematicsQueryOptions for details.
+   * @param intmd_options Container for other IK options, specific to sub goal. See definition of KinematicsQueryOptions for details.
+  */
+  virtual interpolate(double /*percentage*/, Eigen::Isometry3d /*goal_pose*/, const KinematicsQueryOptions& goal_options, KinematicsQueryOptions& intmd_options)
+  {
+    intmd_options = goal_options;
+  }
+
   /**
    * @brief  Virtual destructor for the interface
    */

@@ -158,9 +158,14 @@ double CartesianInterpolator::computeCartesianPath(RobotState* start_state, cons
     Eigen::Isometry3d pose(start_quaternion.slerp(percentage, target_quaternion));
     pose.translation() = percentage * rotated_target.translation() + (1 - percentage) * start_pose.translation();
 
+    // Load solver
+    // TODO(wyattrees): is it better to make options non-const or do some copying here?
+    const kinematics::KinematicsBaseConstPtr& solver = group->getSolverInstance();
+    kinematics::KinematicsQueryOptions intmd_options;
+    solver->interpolate(percentage, rotated_target, options, intmd_options);
     // Explicitly use a single IK attempt only: We want a smooth trajectory.
     // Random seeding (of additional attempts) would probably create IK jumps.
-    if (start_state->setFromIK(group, pose, link->getName(), consistency_limits, 0.0, validCallback, options))
+    if (start_state->setFromIK(group, pose, link->getName(), consistency_limits, 0.0, validCallback, intmd_options))
       traj.push_back(std::make_shared<moveit::core::RobotState>(*start_state));
     else
       break;
