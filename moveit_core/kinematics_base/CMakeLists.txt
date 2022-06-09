@@ -16,6 +16,7 @@ ament_target_dependencies(
   geometric_shapes
   geometry_msgs
   Boost
+  tf2_eigen
 )
 
 install(DIRECTORY include/ DESTINATION include)

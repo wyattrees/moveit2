@@ -42,6 +42,7 @@
 #include "rclcpp/rclcpp.hpp"
 #include <boost/function.hpp>
 #include <string>
+#include <tf2_eigen/tf2_eigen.hpp>
 
 #include "moveit_kinematics_base_export.h"
 
@@ -113,6 +114,8 @@ struct KinematicsQueryOptions
     , discretization_method(DiscretizationMethods::NO_DISCRETIZATION)
   {
   }
+
+  virtual ~KinematicsQueryOptions() = default;
 
   bool lock_redundant_joints;                 /**<  KinematicsQueryOptions#lock_redundant_joints. */
   bool return_approximate_solution;           /**<  KinematicsQueryOptions#return_approximate_solution. */
@@ -525,13 +528,16 @@ public:
     return default_timeout_;
   }
 
-  /** @brief Prepare for one of a series of successive IK calls, whose eventual goal is \e goal_pose.
+  /** @brief Prepare for one in a series of successive IK calls, whose eventual goal is \e goal_pose.
    * @param percentage How far along the path the next IK call will put us towards \e goal_pose
    * @param goal_pose The end pose we are trying to achieve at the end of all IK calls
-   * @param goal_options Container for other IK options, specific to end goal. See definition of KinematicsQueryOptions for details.
-   * @param intmd_options Container for other IK options, specific to sub goal. See definition of KinematicsQueryOptions for details.
-  */
-  virtual interpolate(double /*percentage*/, Eigen::Isometry3d /*goal_pose*/, const KinematicsQueryOptions& goal_options, KinematicsQueryOptions& intmd_options)
+   * @param goal_options Container for other IK options, specific to end goal. See definition of KinematicsQueryOptions
+   * for details.
+   * @param intmd_options Container for other IK options, specific to sub goal. See definition of KinematicsQueryOptions
+   * for details.
+   */
+  virtual void interpolate(double /*percentage*/, Eigen::Isometry3d /*goal_pose*/,
+                           const KinematicsQueryOptions& goal_options, KinematicsQueryOptions& intmd_options) const
   {
     intmd_options = goal_options;
   }

@@ -158,8 +158,7 @@ double CartesianInterpolator::computeCartesianPath(RobotState* start_state, cons
     Eigen::Isometry3d pose(start_quaternion.slerp(percentage, target_quaternion));
     pose.translation() = percentage * rotated_target.translation() + (1 - percentage) * start_pose.translation();
 
-    // Load solver
-    // TODO(wyattrees): is it better to make options non-const or do some copying here?
+    // Load solver, interpolate options
     const kinematics::KinematicsBaseConstPtr& solver = group->getSolverInstance();
     kinematics::KinematicsQueryOptions intmd_options;
     solver->interpolate(percentage, rotated_target, options, intmd_options);
