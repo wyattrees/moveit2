@@ -160,7 +160,8 @@ double CartesianInterpolator::computeCartesianPath(RobotState* start_state, cons
 
     // Explicitly use a single IK attempt only: We want a smooth trajectory.
     // Random seeding (of additional attempts) would probably create IK jumps.
-    if (start_state->setFromIK(group, pose, link->getName(), consistency_limits, 0.0, validCallback, options))
+    if (start_state->setFromIK(group, pose, link->getName(), consistency_limits, 0.0, validCallback, options,
+                               cost_function))
       traj.push_back(std::make_shared<moveit::core::RobotState>(*start_state));
     else
       break;
@@ -189,7 +190,7 @@ double CartesianInterpolator::computeCartesianPath(RobotState* start_state, cons
     std::vector<RobotStatePtr> waypoint_traj;
     double wp_percentage_solved =
         computeCartesianPath(start_state, group, waypoint_traj, link, waypoints[i], global_reference_frame, max_step,
-                             NO_JOINT_SPACE_JUMP_TEST, validCallback, options);
+                             NO_JOINT_SPACE_JUMP_TEST, validCallback, options, cost_function);
     if (fabs(wp_percentage_solved - 1.0) < std::numeric_limits<double>::epsilon())
     {
       percentage_solved = (double)(i + 1) / (double)waypoints.size();

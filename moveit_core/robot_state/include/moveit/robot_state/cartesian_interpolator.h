@@ -126,7 +126,7 @@ public:
 
      For absolute jump thresholds, if any individual joint-space motion delta is larger then \e revolute_jump_threshold
      for revolute joints or \e prismatic_jump_threshold for prismatic joints then this step is considered a failure and
-     the returned path is truncated up to just before the jump.*/
+  */
   static double
   computeCartesianPath(RobotState* start_state, const JointModelGroup* group,
                        std::vector<std::shared_ptr<RobotState>>& traj, const LinkModel* link,
@@ -141,6 +141,7 @@ public:
      for the origin of a robot link (\e link). The target frame is assumed to be either in a global reference frame or
      in the local reference frame of the link. In the latter case (\e global_reference_frame is false) the \e target is
      rotated accordingly. All other comments from the previous function apply. */
+
   static double
   computeCartesianPath(RobotState* start_state, const JointModelGroup* group,
                        std::vector<std::shared_ptr<RobotState>>& traj, const LinkModel* link,
@@ -155,6 +156,7 @@ public:
      reached for the origin of a robot link (\e link). The waypoints are transforms given either in a global reference
      frame or in the local reference frame of the link at the immediately preceding waypoint. The link needs to move
      in a straight line between two consecutive waypoints. All other comments apply. */
+
   static double
   computeCartesianPath(RobotState* start_state, const JointModelGroup* group,
                        std::vector<std::shared_ptr<RobotState>>& traj, const LinkModel* link,
