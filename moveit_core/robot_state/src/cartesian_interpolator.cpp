@@ -199,7 +199,7 @@ double CartesianInterpolator::computeCartesianPath(
   }
 
   percentage_solved *= checkJointSpaceJump(group, traj, jump_threshold);
-
+  return percentage_solved;
 }
 
 double CartesianInterpolator::checkJointSpaceJump(const JointModelGroup* group, std::vector<RobotStatePtr>& traj,
