@@ -137,9 +137,10 @@ def generate_servo_test_description(
         output="screen",
         parameters=[
             servo_params,
-            robot_description,
-            robot_description_semantic,
-            joint_limits_yaml,
+            moveit_config.robot_description,
+            moveit_config.robot_description_semantic,
+            moveit_config.joint_limits,
+            moveit_config.robot_description_kinematics,
         ],
     )
 
