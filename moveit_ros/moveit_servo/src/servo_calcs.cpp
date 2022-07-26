@@ -48,12 +48,14 @@
 // #include <moveit_servo/make_shared_from_pool.h> // TODO(adamp): create an issue about this
 #include <moveit_servo/servo_calcs.h>
 #include <moveit_servo/enforce_limits.hpp>
+#include <moveit_servo/realtime.hpp>
 
 using namespace std::chrono_literals;  // for s, ms, etc.
 
 static const rclcpp::Logger LOGGER = rclcpp::get_logger("moveit_servo.servo_calcs");
 constexpr auto ROS_LOG_THROTTLE_PERIOD = std::chrono::milliseconds(3000).count();
 static constexpr double STOPPED_VELOCITY_EPS = 1e-4;  // rad/s
+const int SCHED_PRIORITY = 50; // RT priority for SCHED_FIFO scheduling
 
 namespace moveit_servo
 {
@@ -278,7 +280,20 @@ void ServoCalcs::start()
   }
 
   stop_requested_ = false;
-  thread_ = std::thread([this] { mainCalcLoop(); });
+  thread_ = std::thread([this] { 
+    if (hasRealtimeKernel())
+    {
+      if (!configureSchedFifo(SCHED_PRIORITY))
+      {
+        RCLCPP_WARN(LOGGER, "Failed to enable FIFO RT scheduling policy");
+      }
+    }
+    else
+    {
+      RCLCPP_WARN(LOGGER, "RT kernel is recommended for better performance");
+    }
+    mainCalcLoop();
+  });
   new_input_cmd_ = false;
 }
 
