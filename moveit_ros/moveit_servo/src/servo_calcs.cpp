@@ -176,6 +176,22 @@ ServoCalcs::ServoCalcs(rclcpp::Node::SharedPtr node,
         parameters_->command_out_topic, rclcpp::SystemDefaultsQoS());
   }
 
+  // could optionally enable this feature via a ROS param
+  const auto getManipulability = [](Eigen::MatrixXd jacobian) {
+    return sqrt((jacobian * jacobian.transpose()).determinant());
+  };
+  cost_fn_ = [&getManipulability](const geometry_msgs::msg::Pose& /*goal_pose*/,
+                                                                  const moveit::core::RobotState& solution_state,
+                                                                  moveit::core::JointModelGroup* jmg,
+                                                                  const std::vector<double>& seed_state) {
+    auto jac = solution_state.getJacobian(jmg);
+    double manip = getManipulability(jac);
+    // if manipulability is high enough, let's not worry about it
+    if (manip > 0.03)
+      return 0.0;
+    return 0.00001 / manip;
+  };
+
   // Publish status
   status_pub_ = node_->create_publisher<std_msgs::msg::Int8>(parameters_->status_topic, rclcpp::SystemDefaultsQoS());
   condition_pub_ = node_->create_publisher<std_msgs::msg::Float64>("~/condition", rclcpp::SystemDefaultsQoS());
@@ -670,8 +686,9 @@ bool ServoCalcs::cartesianServoCalcs(geometry_msgs::msg::TwistStamped& cmd,
     moveit_msgs::msg::MoveItErrorCodes err;
     kinematics::KinematicsQueryOptions opts;
     opts.return_approximate_solution = true;
-    if (ik_solver_->searchPositionIK(next_pose, internal_joint_state_.position, parameters_->publish_period / 2.0,
-                                     solution, err, opts))
+    static kinematics::KinematicsBase::IKCallbackFn callback_fn;
+    if (ik_solver_->searchPositionIK(std::vector<geometry_msgs::msg::Pose>({ next_pose }), internal_joint_state_.position, parameters_->publish_period / 2.0,
+                                     std::vector<double>(), solution, callback_fn, cost_fn_, err, opts))
     {
       // find the difference in joint positions that will get us to the desired pose
       for (size_t i = 0; i < num_joints_; ++i)

@@ -293,6 +293,8 @@ protected:
 
   moveit::core::RobotStatePtr current_state_;
 
+  kinematics::KinematicsBase::IKCostFn cost_fn_;
+
   // (mutex protected below)
   // internal_joint_state_ is used in servo calculations. It shouldn't be relied on to be accurate.
   // original_joint_state_ is the same as incoming_joint_state_ except it only contains the joints the servo node acts
