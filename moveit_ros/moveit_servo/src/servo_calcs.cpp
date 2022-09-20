@@ -879,6 +879,13 @@ void ServoCalcs::updateJoints()
   current_state_->copyJointGroupPositions(joint_model_group_, internal_joint_state_.position);
   current_state_->copyJointGroupVelocities(joint_model_group_, internal_joint_state_.velocity);
 
+  std::stringstream strm;
+  for (const auto& jp: internal_joint_state_.position)
+  {
+    strm << jp << ", ";
+  }
+
+  RCLCPP_WARN_STREAM(LOGGER, "INTERNAL JOINT STATE: " << strm.string().c_str());
   // Cache the original joints in case they need to be reset
   original_joint_state_ = internal_joint_state_;
 }
